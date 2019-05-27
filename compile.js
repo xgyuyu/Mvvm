@@ -67,13 +67,34 @@ lib = {
             return prev[next]
         },vm.$data)
     },
+    setModelVal(vm,expr,newVal){
+        // a.b
+        expr = expr.split('.')
+        // 渠道最后一项就应该赋值了
+        return expr.reduce((prev, next, currentIndex) => {
+            if (currentIndex === expr.length - 1){
+                return prev[next] = newVal
+            }
+            return prev[next] // 取值
+        },vm.$data)
+    },
     model(node,vm,expr){
         let updateFn = this.updater['modelUpdater']
         new Watcher(vm,expr,()=>{
 			// 当值变化后会调用cb 将新的值传递过来
 			updateFn && updateFn(node,this.getVal(vm,expr))
-		})
+        })
+        node.addEventListener('input',(e)=>{
+            let newVal = e.target.value
+            // 把新的值赋值给vm对应的expr
+            this.setModelVal(vm,expr,newVal)
+        })
         updateFn && updateFn(node, this.getVal(vm,expr))
+    },
+    getTextVal(vm, expr){
+        return expr.replace(/{\{([^}]+)\}\}/g, (...arguments)=>{
+            return this.getVal(vm, arguments[1])
+        })
     },
     text(node,vm,expr) {
         let reg = /{\{([^}]+)\}\}/g
@@ -83,16 +104,36 @@ lib = {
         })
         expr.replace(/\{\{([^}]+)\}\}/g,(...arguments)=>{
 			// return this.getVal(vm,arguments[1])
-			new Watcher(vm,arguments[1],()=>{
+			new Watcher(vm,arguments[1],(newValue)=>{
 				// 如果数据变化了,文本节点需要重新获取依赖的数据更新文本的内容
-				updateFn && updateFn(node,expr.replace(/\{\{([^}]+)\}\}/g,(...arguments)=>{
-                    return this.getVal(vm,arguments[1])
-                })(vm,expr))
+				updateFn && updateFn(node,this.getTextVal(vm,expr))
 			})
 		})
-        updateFn && updateFn(node,value)
+		
+
+		updateFn && updateFn(node,value)
 
     },
+    /* getTextVal(vm,expr){
+		return expr.replace(/\{\{([^}]+)\}\}/g,(...arguments)=>{
+			return this.getVal(vm,arguments[1])
+		})
+	},
+	// 文本处理 更新视图文本
+	text(node,vm,expr){
+		let updateFn = this.updater['textUpdater']
+		// {{message}} 替换
+		let value = this.getTextVal(vm,expr)
+
+		expr.replace(/\{\{([^}]+)\}\}/g,(...arguments)=>{
+			// return this.getVal(vm,arguments[1])
+			new Watcher(vm,arguments[1],(newValue)=>{
+				// 如果数据变化了,文本节点需要重新获取依赖的数据更新文本的内容
+				updateFn && updateFn(node,this.getTextVal(vm,expr))
+			})
+		})
+		updateFn && updateFn(node,value)
+	}, */
     updater: {
         modelUpdater(node,value) {
             node.value = value

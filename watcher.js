@@ -12,7 +12,12 @@ class Watcher {
         },vm.$data)
     }
     get() {
+        // 把DEp的this放过去,this是当前watch
+        // 我们在编译赋值的时候new Watch,就产生了实力,实例赋给了Dep.target属性
+        Dep.target = this
         let value = this.getVal(this.vm,this.expr)
+        // 用完在去掉
+        Dep.target = null
         return value
     }
     updated() {
@@ -23,3 +28,5 @@ class Watcher {
         }
     }
 }
+
+
