@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <button onclick="functionInfo()">测试调用dll函数</button>
+    </div>
+    <!-- 
+        文件名 mysql_dll2.dll
+        CXyz xyz;
+        xyz.getBuffer(buffer);
+        void getBuffer(char * outStr);
+     -->
+    <script language="JavaScript">
+        //JavaScript调用dll的公用方法
+        //appName dll组件名（dll文件名） +　dll文件类名
+        //methodName dll类中的方法名
+        /* function run_dll(appName, methodName) {
+            window.oldOnError = window.onerror;
+            window._command = appName;
+            window.onerror = function (err) {
+                if (err.indexOf('Automation') != -1) {
+                    //alert('执行' + window._command + '过程中\n\r\n\r无法找到路径或被您禁止运行本地文件！');
+                    alert('您未安装所需要的浏览器插件，请下载安装');
+                    window.open('http://www.baidu.com/');
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+            //   var obj = new ActiveXObject(mysql_dll2, CXyz);// dll组件名 +　dll文件类名
+            if (window.ActiveXObject) {
+                //支持-通过ActiveXObject的一个新实例来创建XMLHttpRequest对象
+                xmlHttp = new ActiveXObject(appName);
+            }
+            else if (window.XMLHttpRequest) {
+                xmlHttp = new XMLHttpRequest(appName)
+            }
+            console.log(xmlHttp)
+            var result = xmlHttp[methodName](); //dll类中的方法名
+            console.log(result)
+        } */
+        function functionInfo() {
+            var mydll=new ActiveXObject("XYZ");
+            console.log(mydll)
+            var buffer;
+            var result=mydll.getBuffer(buffer);
+
+            alert(result);
+        }
+    </script>
+</body>
+
+</html>
